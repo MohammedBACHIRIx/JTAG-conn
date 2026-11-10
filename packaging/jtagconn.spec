@@ -6,7 +6,7 @@ from PyInstaller.utils.hooks import collect_submodules
 
 block_cipher = None
 
-project_root = Path(__file__).resolve().parent.parent
+project_root = Path(SPECPATH).resolve().parent
 src_path = project_root / "src"
 
 hiddenimports = []
