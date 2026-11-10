@@ -21,6 +21,9 @@ dev = [
     "ruff",
 ]
 
+[project.scripts]
+jtagconn = "jtagconn.app:main"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 

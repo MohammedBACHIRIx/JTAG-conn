@@ -56,7 +56,7 @@
 - [x] T015 [P] [US1] Implement `FlashGuard` (detects sections overlapping device `flash_regions` and requires confirmation before load) in `src/jtagconn/core/flash_guard.py`
 - [x] T016 [US1] Implement `TargetManager` (probe discovery, configure, connect/disconnect, cancellable `load_program`, `run`, and connection watchdog) in `src/jtagconn/core/target_manager.py`
 - [x] T017 [P] [US1] Implement session & recent-files persistence (`%APPDATA%/JTAG-conn` / `~/.config/jtagconn`) in `src/jtagconn/persistence/session.py`
-- [ ] T018 [US1] Implement connection toolbar, `.out` file picker, flash confirmation dialog, log panel, and status bar in `src/jtagconn/ui/connection_panel.py`, `src/jtagconn/ui/log_view.py`, and `src/jtagconn/ui/main_window.py`
+- [x] T018 [US1] Implement connection toolbar, `.out` file picker, flash confirmation dialog, log panel, and status bar in `src/jtagconn/ui/connection_panel.py`, `src/jtagconn/ui/log_view.py`, and `src/jtagconn/ui/main_window.py`
 
 **Checkpoint**: User Story 1 is functional and independently testable.
 
@@ -75,7 +75,7 @@
 ### Implementation for User Story 2
 
 - [x] T020 [US2] Extend `TargetManager` and `ProgramImage` with PC-to-function lookup and strict state-guarded `halt()`, `resume()`, and `reset()` in `src/jtagconn/core/target_manager.py` and `src/jtagconn/symbols/image.py`
-- [ ] T021 [US2] Wire Halt, Resume, and Reset actions with state-based enablement and PC/function readout in `src/jtagconn/ui/connection_panel.py` and `src/jtagconn/ui/main_window.py`
+- [x] T021 [US2] Wire Halt, Resume, and Reset actions with state-based enablement and PC/function readout in `src/jtagconn/ui/connection_panel.py` and `src/jtagconn/ui/main_window.py`
 
 **Checkpoint**: User Stories 1 and 2 work independently.
 
@@ -97,7 +97,7 @@
 - [x] T024 [P] [US3] Implement `TypeInfo` codec and range/format validator (int/uint 16/32/64, float32/64, enum, pointer, struct, array) in `src/jtagconn/symbols/types.py`
 - [x] T025 [P] [US3] Implement fast prefix/substring `SymbolIndex` over `ProgramImage` symbols in `src/jtagconn/symbols/index.py`
 - [x] T026 [US3] Implement high-efficiency `WatchService` (contiguous address coalescing, adaptive timer that pauses when hidden/disconnected, value hash diffing to emit only changed nodes, validated writes) in `src/jtagconn/core/watch_service.py`
-- [ ] T027 [US3] Implement `WatchView` (`QAbstractItemModel` tree with autocomplete adder, format selector, inline editing, and status badges) in `src/jtagconn/ui/watch_view.py`
+- [x] T027 [US3] Implement `WatchView` (`QAbstractItemModel` tree with autocomplete adder, format selector, inline editing, and status badges) in `src/jtagconn/ui/watch_view.py`
 
 **Checkpoint**: User Stories 1, 2, and 3 work independently.
 
@@ -116,7 +116,7 @@
 ### Implementation for User Story 4
 
 - [x] T029 [US4] Implement `MemoryService` (symbol-to-address resolution, chunked reads, diff detection, format conversion) in `src/jtagconn/core/memory_service.py`
-- [ ] T030 [US4] Implement virtualized table `MemoryView` (`QAbstractTableModel`) with address/symbol input, format selector, and refresh controls in `src/jtagconn/ui/memory_view.py`
+- [x] T030 [US4] Implement virtualized table `MemoryView` (`QAbstractTableModel`) with address/symbol input, format selector, and refresh controls in `src/jtagconn/ui/memory_view.py`
 
 ---
 
@@ -133,7 +133,7 @@
 ### Implementation for User Story 5
 
 - [x] T032 [US5] Implement `StackService` (call stack fetch on halt, per-frame locals evaluation, `unavailable` handling for optimized-out locals, validated local assignment, auto-clear on run) in `src/jtagconn/core/stack_service.py`
-- [ ] T033 [US5] Implement `LocalsView` dock (call stack list + frame locals tree view with inline editing) in `src/jtagconn/ui/locals_view.py`
+- [x] T033 [US5] Implement `LocalsView` dock (call stack list + frame locals tree view with inline editing) in `src/jtagconn/ui/locals_view.py`
 
 ---
 
@@ -150,7 +150,7 @@
 ### Implementation for User Story 6
 
 - [x] T035 [US6] Extend `TargetManager`, `WatchService`, `MemoryService`, and `StackService` for multi-core session isolation, boot-dependency diagnostics (`CoreNotAvailable`), and `run_all`/`halt_all` in `src/jtagconn/core/target_manager.py`
-- [ ] T036 [US6] Implement `CoresPanel` dock and Run All / Halt All toolbar controls in `src/jtagconn/ui/cores_panel.py` and `src/jtagconn/ui/main_window.py`
+- [x] T036 [US6] Implement `CoresPanel` dock and Run All / Halt All toolbar controls in `src/jtagconn/ui/cores_panel.py` and `src/jtagconn/ui/main_window.py`
 
 ---
 
@@ -158,10 +158,10 @@
 
 **Purpose**: End-to-end UI tests, CPU/latency efficiency verification, CLI entry point (`--simulate`), and Windows PyInstaller packaging
 
-- [ ] T037 [P] Implement CLI entry point (`python -m jtagconn [--simulate]`) and application bootstrap in `src/jtagconn/app.py` and `src/jtagconn/__main__.py`
-- [ ] T038 [P] Implement `pytest-qt` end-to-end UI test suite and performance/efficiency benchmark test (verifying SC-004 <1s 50-symbol refresh and SC-008 zero idle polling) in `tests/ui/test_main_window.py`
-- [ ] T039 [P] Create single-file `.exe` PyInstaller spec (`--onefile --windowed` bundling all dependencies and `.ccxml` templates), Inno Setup single-file installer script, PowerShell build script, and GitHub Actions Windows `.exe` build workflow in `packaging/jtagconn.spec`, `packaging/installer.iss`, `packaging/build_windows.ps1`, and `.github/workflows/build-windows-exe.yml`
-- [ ] T040 Run full test & lint suite (`pytest` and `ruff check`) and validate against [quickstart.md](./quickstart.md)
+- [x] T037 [P] Implement CLI entry point (`python -m jtagconn [--simulate]`) and application bootstrap in `src/jtagconn/app.py` and `src/jtagconn/__main__.py`
+- [x] T038 [P] Implement `pytest-qt` end-to-end UI test suite and performance/efficiency benchmark test (verifying SC-004 <1s 50-symbol refresh and SC-008 zero idle polling) in `tests/ui/test_main_window.py`
+- [x] T039 [P] Create single-file `.exe` PyInstaller spec (`--onefile --windowed` bundling all dependencies and `.ccxml` templates), Inno Setup single-file installer script, PowerShell build script, and GitHub Actions Windows `.exe` build workflow in `packaging/jtagconn.spec`, `packaging/installer.iss`, `packaging/build_windows.ps1`, and `.github/workflows/build-windows-exe.yml`
+- [x] T040 Run full test & lint suite (`pytest` and `ruff check`) and validate against [quickstart.md](./quickstart.md)
 
 ---
 
