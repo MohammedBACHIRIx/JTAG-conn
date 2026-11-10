@@ -14,9 +14,9 @@
 
 **Purpose**: Project initialization, packaging metadata, and directory layout
 
-- [ ] T001 Create project directory structure (`src/jtagconn/{backend,core,symbols,persistence,ui}`, `tests/{contract,unit,integration,ui,fixtures}`, `packaging/`) per [plan.md](./plan.md)
-- [ ] T002 Create `pyproject.toml` with Python 3.12+, `PySide6`, `pyelftools`, `pydantic`, and dev dependencies (`pytest`, `pytest-qt`, `ruff`)
-- [ ] T003 [P] Configure linting/formatting and pytest markers (`hw`) in `pyproject.toml` and `tests/conftest.py`
+- [x] T001 Create project directory structure (`src/jtagconn/{backend,core,symbols,persistence,ui}`, `tests/{contract,unit,integration,ui,fixtures}`, `packaging/`) per [plan.md](./plan.md)
+- [x] T002 Create `pyproject.toml` with Python 3.12+, `PySide6`, `pyelftools`, `pydantic`, and dev dependencies (`pytest`, `pytest-qt`, `ruff`)
+- [x] T003 [P] Configure linting/formatting and pytest markers (`hw`) in `pyproject.toml` and `tests/conftest.py`
 
 ---
 
@@ -26,14 +26,14 @@
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete
 
-- [ ] T004 [P] Implement domain models and enums (`Probe`, `DeviceProfile`, `CoreProfile`, `Core`, `CoreState`, `ProgramImage`, `Section`, `Symbol`, `TypeInfo`, `WatchEntry`, `StackFrame`, `MemoryView`, `Session`) in `src/jtagconn/core/models.py`
-- [ ] T005 [P] Implement device catalog for `F28388D`, `F28069M`, `F28M35x`, `F28M36x`, `F28P65x` (core maps, address units, flash ranges, boot dependencies) in `src/jtagconn/core/devices.py`
-- [ ] T006 [P] Define `DebugBackend` protocol and typed exceptions (`ProbeNotFound`, `TargetNotResponding`, `ProbeBusy`, `DeviceSecured`, `CoreNotAvailable`, `InvalidImage`, `VerifyError`, `MemoryAccessError`, `ConnectionLost`, `EngineMissing`) in `src/jtagconn/backend/base.py`
-- [ ] T007 [P] Implement structured timestamped operation logger and plain-language error formatter in `src/jtagconn/core/logging_service.py`
-- [ ] T008 Implement `SimulatedBackend` (multi-core 16-bit word & byte-addressed memory spaces, simulated symbols, callstack, locals, flash verify, and fault injection) in `src/jtagconn/backend/simulated.py`
-- [ ] T009Implement `CcsScriptingBackend` wrapping TI CCS 20.x `scripting.initScripting` and `.ccxml` template generator in `src/jtagconn/backend/ccs_scripting.py` and `src/jtagconn/backend/ccxml/generator.py`
-- [ ] T010 Implement zero-busy-wait event-driven worker thread (`EngineWorker`) with blocking command queue, cancellation tokens, and Qt signals in `src/jtagconn/core/worker.py`
-- [ ] T011 [P] Create synthetic minimal ELF `.out` fixture generator and contract test suite for `DebugBackend` in `tests/fixtures/make_fixtures.py` and `tests/contract/test_debug_backend.py`
+- [x] T004 [P] Implement domain models and enums (`Probe`, `DeviceProfile`, `CoreProfile`, `Core`, `CoreState`, `ProgramImage`, `Section`, `Symbol`, `TypeInfo`, `WatchEntry`, `StackFrame`, `MemoryView`, `Session`) in `src/jtagconn/core/models.py`
+- [x] T005 [P] Implement device catalog for `F28388D`, `F28069M`, `F28M35x`, `F28M36x`, `F28P65x` (core maps, address units, flash ranges, boot dependencies) in `src/jtagconn/core/devices.py`
+- [x] T006 [P] Define `DebugBackend` protocol and typed exceptions (`ProbeNotFound`, `TargetNotResponding`, `ProbeBusy`, `DeviceSecured`, `CoreNotAvailable`, `InvalidImage`, `VerifyError`, `MemoryAccessError`, `ConnectionLost`, `EngineMissing`) in `src/jtagconn/backend/base.py`
+- [x] T007 [P] Implement structured timestamped operation logger and plain-language error formatter in `src/jtagconn/core/logging_service.py`
+- [x] T008 Implement `SimulatedBackend` (multi-core 16-bit word & byte-addressed memory spaces, simulated symbols, callstack, locals, flash verify, and fault injection) in `src/jtagconn/backend/simulated.py`
+- [x] T009Implement `CcsScriptingBackend` wrapping TI CCS 20.x `scripting.initScripting` and `.ccxml` template generator in `src/jtagconn/backend/ccs_scripting.py` and `src/jtagconn/backend/ccxml/generator.py`
+- [x] T010 Implement zero-busy-wait event-driven worker thread (`EngineWorker`) with blocking command queue, cancellation tokens, and Qt signals in `src/jtagconn/core/worker.py`
+- [x] T011 [P] Create synthetic minimal ELF `.out` fixture generator and contract test suite for `DebugBackend` in `tests/fixtures/make_fixtures.py` and `tests/contract/test_debug_backend.py`
 
 **Checkpoint**: Foundation ready — `DebugBackend` contract tests pass against `SimulatedBackend`
 
@@ -160,7 +160,7 @@
 
 - [ ] T037 [P] Implement CLI entry point (`python -m jtagconn [--simulate]`) and application bootstrap in `src/jtagconn/app.py` and `src/jtagconn/__main__.py`
 - [ ] T038 [P] Implement `pytest-qt` end-to-end UI test suite and performance/efficiency benchmark test (verifying SC-004 <1s 50-symbol refresh and SC-008 zero idle polling) in `tests/ui/test_main_window.py`
-- [ ] T039 [P] Create PyInstaller spec and Windows build script in `packaging/jtagconn.spec`
+- [ ] T039 [P] Create single-file `.exe` PyInstaller spec (`--onefile --windowed` bundling all dependencies and `.ccxml` templates), Inno Setup single-file installer script, PowerShell build script, and GitHub Actions Windows `.exe` build workflow in `packaging/jtagconn.spec`, `packaging/installer.iss`, `packaging/build_windows.ps1`, and `.github/workflows/build-windows-exe.yml`
 - [ ] T040 Run full test & lint suite (`pytest` and `ruff check`) and validate against [quickstart.md](./quickstart.md)
 
 ---

@@ -17,7 +17,7 @@ CCS Scripting API; a simulated backend enables hardware-free testing (see [resea
 **Language/Version**: Python 3.12
 
 **Primary Dependencies**: PySide6 (Qt 6), TI CCS 20.x Scripting API (`scripting`), pyelftools,
-pydantic (settings/session models), PyInstaller (packaging)
+pydantic (settings/session models), PyInstaller (`--onefile --windowed` single-file `.exe` packaging + Inno Setup installer)
 
 **Storage**: JSON files — per-user settings in `%APPDATA%\JTAG-conn\`, session files (`*.jtagc.json`)
 

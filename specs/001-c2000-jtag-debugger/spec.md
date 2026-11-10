@@ -187,7 +187,7 @@ halt only CPU2, and confirm CPU1 keeps running while CPU2 variables are inspecte
 
 ### Functional Requirements
 
-- **FR-001**: System MUST run as a desktop application on Windows 10/11 64-bit.
+- **FR-001**: System MUST run as a desktop application on Windows 10/11 64-bit, packaged as a standalone single-file `.exe` (plus optional single-file installer `.exe`) bundling Python, UI libraries, and `.ccxml` templates so no Python runtime installation is required.
 - **FR-002**: System MUST let users select a TI `.out` executable via file dialog and remember
   recently used files.
 - **FR-003**: System MUST detect attached supported JTAG probes and let the user choose one.

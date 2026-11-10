@@ -1,0 +1,1 @@
+"""Image and symbol handling."""
