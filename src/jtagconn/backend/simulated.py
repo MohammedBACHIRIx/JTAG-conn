@@ -185,6 +185,9 @@ class SimulatedBackend(DebugBackend):
             ),
         }
         self._symbols[core] = symbols
+        prev_locals = None
+        if core in self._values:
+            prev_locals = self._values[core].get("__frame_locals__")
         self._values[core] = {
             "g_counter": 0,
             "g_ctrl.gain": 100,
@@ -192,6 +195,9 @@ class SimulatedBackend(DebugBackend):
             "g_status": 0,
             "g_buffer": [0, 0, 0, 0],
         }
+        if prev_locals is not None:
+            self._values[core]["__frame_locals__"] = prev_locals
+        self._init_frame_locals(core)
 
     # --- DebugBackend implementation ---
     def list_probes(self) -> list[Probe]:
@@ -252,6 +258,7 @@ class SimulatedBackend(DebugBackend):
                     f"Core '{core}' requires boot master '{boot_master}' to be connected first"
                 )
         self._core_states[core] = CoreState.Halted
+        self._init_frame_locals(core)
         if self._pc.get(core, 0) == 0:
             self._pc[core] = 0x080000
 
@@ -356,8 +363,8 @@ class SimulatedBackend(DebugBackend):
         vals = self._values.get(core, {})
         syms = self._symbols.get(core, {})
         expr = expression.strip()
-        # direct
-        if expr in vals:
+        # direct (symbol/global values)
+        if expr in vals and expr != "__frame_locals__":
             v = vals[expr]
             sym = syms.get(expr)
             tname = sym.type_info.name if sym else "unknown"
@@ -386,13 +393,17 @@ class SimulatedBackend(DebugBackend):
                     tname = elem.name if elem else "uint16"
                     return v, tname, str(v), ValueStatus.current
                 return None, "unknown", "index out of range", ValueStatus.error
-        # function-local locals recognized by name in frame 0 context
-        if expr in {"err", "pwm_duty"}:
-            v = 0 if expr == "err" else 50
-            tname = "int16" if expr == "err" else "uint16"
-            return v, tname, str(v), ValueStatus.current
-        if expr == "optimized_var":
-            return None, "unknown", "<optimized out>", ValueStatus.unavailable
+        # frame locals (recognize by name; prefer current frame 0 state)
+        self._init_frame_locals(core)
+        fl_all = vals.get("__frame_locals__", {})
+        for fr in sorted(fl_all.keys()):
+            info = fl_all[fr].get(expr)
+            if info is not None:
+                v = info.get("value")
+                tname = str(info.get("type", "unknown"))
+                status = info.get("status", ValueStatus.current)
+                disp = info.get("display", str(v) if v is not None else "")
+                return v, tname, str(disp), status
         return None, "unknown", "not found", ValueStatus.not_found
 
     def evaluate(self, core: str, expression: str, frame: int | None = None) -> ValueNode:
@@ -462,6 +473,8 @@ class SimulatedBackend(DebugBackend):
         try:
             if v_str.lower().startswith("0x"):
                 parsed: object = int(v_str, 16)
+            elif v_str.lower().startswith("0b"):
+                parsed = int(v_str, 2)
             else:
                 parsed = int(v_str, 10)
         except ValueError:
@@ -469,7 +482,24 @@ class SimulatedBackend(DebugBackend):
                 parsed = float(v_str)
             except ValueError:
                 parsed = v_str
-        if expr in vals and not isinstance(vals[expr], list):
+        # frame locals (respect frame if provided)
+        self._init_frame_locals(core)
+        fl_all = vals.get("__frame_locals__", {})
+        if frame is not None:
+            finfo = fl_all.get(frame, {}).get(expr)
+            if finfo is not None and finfo.get("status") != ValueStatus.unavailable:
+                finfo["value"] = parsed
+                finfo["display"] = str(parsed)
+                self._log("assign", f"Assigned {expr} = {value} (frame {frame})", core=core)
+                return
+        # search any frame local by name
+        for fr, fl in fl_all.items():
+            if expr in fl and fl[expr].get("status") != ValueStatus.unavailable:
+                fl[expr]["value"] = parsed
+                fl[expr]["display"] = str(parsed)
+                self._log("assign", f"Assigned {expr} = {value} (frame {fr})", core=core)
+                return
+        if expr in vals and not isinstance(vals[expr], list) and expr != "__frame_locals__":
             vals[expr] = parsed
             self._log("assign", f"Assigned {expr} = {value}", core=core)
             return
@@ -505,49 +535,57 @@ class SimulatedBackend(DebugBackend):
         self._log("callstack", f"Call stack depth {len(frames)}", core=core)
         return frames
 
+    def _init_frame_locals(self, core: str) -> None:
+        # Mutable frame-local storage so assign/evaluate/locals stay consistent.
+        self._values.setdefault(core, {})
+        self._values[core].setdefault("__frame_locals__", {})
+        fl = self._values[core]["__frame_locals__"]
+        fl.setdefault(
+            0,
+            {
+                "err": {"type": "int16", "value": 0, "status": ValueStatus.current},
+                "pwm_duty": {"type": "uint16", "value": 50, "status": ValueStatus.current},
+                "optimized_var": {
+                    "type": "unknown",
+                    "value": None,
+                    "status": ValueStatus.unavailable,
+                    "display": "<optimized out>",
+                },
+            },
+        )
+        fl.setdefault(
+            1,
+            {"status": {"type": "int16", "value": 0, "status": ValueStatus.current}},
+        )
+
     def locals(self, core: str, frame: int) -> list[ValueNode]:
         self._ensure_core(core)
         self._check_connection(core)
-        # frame 0 locals per spec
-        if frame == 0:
-            return [
+        self._init_frame_locals(core)
+        fl = self._values[core]["__frame_locals__"].get(frame, {})
+        nodes: list[ValueNode] = []
+        for name, info in fl.items():
+            val = info.get("value")
+            status = info.get("status", ValueStatus.current)
+            display = info.get("display", str(val) if val is not None else "")
+            raw_out: int | float | str | None
+            if isinstance(val, (int, float, str)):
+                raw_out = val
+            elif val is None:
+                raw_out = None
+            else:
+                raw_out = str(val)
+            nodes.append(
                 ValueNode(
-                    name="err",
-                    expression="err",
-                    type_name="int16",
-                    raw_value=0,
-                    display_value="0",
-                    status=ValueStatus.current,
-                ),
-                ValueNode(
-                    name="pwm_duty",
-                    expression="pwm_duty",
-                    type_name="uint16",
-                    raw_value=50,
-                    display_value="50",
-                    status=ValueStatus.current,
-                ),
-                ValueNode(
-                    name="optimized_var",
-                    expression="optimized_var",
-                    type_name="unknown",
-                    raw_value=None,
-                    display_value="<optimized out>",
-                    status=ValueStatus.unavailable,
-                ),
-            ]
-        if frame == 1:
-            return [
-                ValueNode(
-                    name="status",
-                    expression="status",
-                    type_name="int16",
-                    raw_value=0,
-                    display_value="0",
-                    status=ValueStatus.current,
+                    name=name,
+                    expression=name,
+                    type_name=str(info.get("type", "unknown")),
+                    raw_value=raw_out,
+                    display_value=str(display),
+                    status=status,
                 )
-            ]
-        return []
+            )
+        return nodes
 
     def symbols(self, core: str) -> list[Symbol]:
         self._ensure_core(core)

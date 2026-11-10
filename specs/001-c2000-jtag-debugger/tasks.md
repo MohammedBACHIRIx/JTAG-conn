@@ -47,15 +47,15 @@
 
 ### Tests for User Story 1 ⚠️
 
-- [ ] T012 [P] [US1] Unit tests for `ProgramImage` loader, `FlashGuard`, and `TargetManager` connect/load/run state machine in `tests/unit/test_us1_connect_load_run.py`
-- [ ] T013 [P] [US1] Integration test for connect, flash-confirm, load with progress/verify, run, and connection error handling in `tests/integration/test_us1_flow.py`
+- [x] T012 [P] [US1] Unit tests for `ProgramImage` loader, `FlashGuard`, and `TargetManager` connect/load/run state machine in `tests/unit/test_us1_connect_load_run.py`
+- [x] T013 [P] [US1] Integration test for connect, flash-confirm, load with progress/verify, run, and connection error handling in `tests/integration/test_us1_flow.py`
 
 ### Implementation for User Story 1
 
-- [ ] T014 [P] [US1] Implement `ProgramImage` parser (ELF sections/entry/symbols via `pyelftools`, COFF fallback metadata, mtime tracking, device compatibility check) in `src/jtagconn/symbols/image.py`
-- [ ] T015 [P] [US1] Implement `FlashGuard` (detects sections overlapping device `flash_regions` and requires confirmation before load) in `src/jtagconn/core/flash_guard.py`
-- [ ] T016 [US1] Implement `TargetManager` (probe discovery, configure, connect/disconnect, cancellable `load_program`, `run`, and connection watchdog) in `src/jtagconn/core/target_manager.py`
-- [ ] T017 [P] [US1] Implement session & recent-files persistence (`%APPDATA%/JTAG-conn` / `~/.config/jtagconn`) in `src/jtagconn/persistence/session.py`
+- [x] T014 [P] [US1] Implement `ProgramImage` parser (ELF sections/entry/symbols via `pyelftools`, COFF fallback metadata, mtime tracking, device compatibility check) in `src/jtagconn/symbols/image.py`
+- [x] T015 [P] [US1] Implement `FlashGuard` (detects sections overlapping device `flash_regions` and requires confirmation before load) in `src/jtagconn/core/flash_guard.py`
+- [x] T016 [US1] Implement `TargetManager` (probe discovery, configure, connect/disconnect, cancellable `load_program`, `run`, and connection watchdog) in `src/jtagconn/core/target_manager.py`
+- [x] T017 [P] [US1] Implement session & recent-files persistence (`%APPDATA%/JTAG-conn` / `~/.config/jtagconn`) in `src/jtagconn/persistence/session.py`
 - [ ] T018 [US1] Implement connection toolbar, `.out` file picker, flash confirmation dialog, log panel, and status bar in `src/jtagconn/ui/connection_panel.py`, `src/jtagconn/ui/log_view.py`, and `src/jtagconn/ui/main_window.py`
 
 **Checkpoint**: User Story 1 is functional and independently testable.
@@ -70,11 +70,11 @@
 
 ### Tests for User Story 2 ⚠️
 
-- [ ] T019 [P] [US2] Unit & integration tests for `halt`, `resume`, `reset`, and PC-to-function symbol resolution in `tests/integration/test_us2_halt_resume.py`
+- [x] T019 [P] [US2] Unit & integration tests for `halt`, `resume`, `reset`, and PC-to-function symbol resolution in `tests/integration/test_us2_halt_resume.py`
 
 ### Implementation for User Story 2
 
-- [ ] T020 [US2] Extend `TargetManager` and `ProgramImage` with PC-to-function lookup and strict state-guarded `halt()`, `resume()`, and `reset()` in `src/jtagconn/core/target_manager.py` and `src/jtagconn/symbols/image.py`
+- [x] T020 [US2] Extend `TargetManager` and `ProgramImage` with PC-to-function lookup and strict state-guarded `halt()`, `resume()`, and `reset()` in `src/jtagconn/core/target_manager.py` and `src/jtagconn/symbols/image.py`
 - [ ] T021 [US2] Wire Halt, Resume, and Reset actions with state-based enablement and PC/function readout in `src/jtagconn/ui/connection_panel.py` and `src/jtagconn/ui/main_window.py`
 
 **Checkpoint**: User Stories 1 and 2 work independently.
@@ -89,14 +89,14 @@
 
 ### Tests for User Story 3 ⚠️
 
-- [ ] T022 [P] [US3] Unit tests for `SymbolIndex` autocomplete, `TypeInfo` encode/decode/validation, and contiguous memory read coalescing in `tests/unit/test_us3_watch_types.py`
-- [ ] T023 [P] [US3] Integration test for live watch polling, diff-only updates, stale fallback, and validated symbol writes in `tests/integration/test_us3_watch_flow.py`
+- [x] T022 [P] [US3] Unit tests for `SymbolIndex` autocomplete, `TypeInfo` encode/decode/validation, and contiguous memory read coalescing in `tests/unit/test_us3_watch_types.py`
+- [x] T023 [P] [US3] Integration test for live watch polling, diff-only updates, stale fallback, and validated symbol writes in `tests/integration/test_us3_watch_flow.py`
 
 ### Implementation for User Story 3
 
-- [ ] T024 [P] [US3] Implement `TypeInfo` codec and range/format validator (int/uint 16/32/64, float32/64, enum, pointer, struct, array) in `src/jtagconn/symbols/types.py`
-- [ ] T025 [P] [US3] Implement fast prefix/substring `SymbolIndex` over `ProgramImage` symbols in `src/jtagconn/symbols/index.py`
-- [ ] T026 [US3] Implement high-efficiency `WatchService` (contiguous address coalescing, adaptive timer that pauses when hidden/disconnected, value hash diffing to emit only changed nodes, validated writes) in `src/jtagconn/core/watch_service.py`
+- [x] T024 [P] [US3] Implement `TypeInfo` codec and range/format validator (int/uint 16/32/64, float32/64, enum, pointer, struct, array) in `src/jtagconn/symbols/types.py`
+- [x] T025 [P] [US3] Implement fast prefix/substring `SymbolIndex` over `ProgramImage` symbols in `src/jtagconn/symbols/index.py`
+- [x] T026 [US3] Implement high-efficiency `WatchService` (contiguous address coalescing, adaptive timer that pauses when hidden/disconnected, value hash diffing to emit only changed nodes, validated writes) in `src/jtagconn/core/watch_service.py`
 - [ ] T027 [US3] Implement `WatchView` (`QAbstractItemModel` tree with autocomplete adder, format selector, inline editing, and status badges) in `src/jtagconn/ui/watch_view.py`
 
 **Checkpoint**: User Stories 1, 2, and 3 work independently.
@@ -111,11 +111,11 @@
 
 ### Tests for User Story 4 ⚠️
 
-- [ ] T028 [P] [US4] Unit & integration tests for `MemoryService` address/symbol resolution, word/byte formatting, and inaccessible range handling in `tests/integration/test_us4_memory.py`
+- [x] T028 [P] [US4] Unit & integration tests for `MemoryService` address/symbol resolution, word/byte formatting, and inaccessible range handling in `tests/integration/test_us4_memory.py`
 
 ### Implementation for User Story 4
 
-- [ ] T029 [US4] Implement `MemoryService` (symbol-to-address resolution, chunked reads, diff detection, format conversion) in `src/jtagconn/core/memory_service.py`
+- [x] T029 [US4] Implement `MemoryService` (symbol-to-address resolution, chunked reads, diff detection, format conversion) in `src/jtagconn/core/memory_service.py`
 - [ ] T030 [US4] Implement virtualized table `MemoryView` (`QAbstractTableModel`) with address/symbol input, format selector, and refresh controls in `src/jtagconn/ui/memory_view.py`
 
 ---
@@ -128,11 +128,11 @@
 
 ### Tests for User Story 5 ⚠️
 
-- [ ] T031 [P] [US5] Integration test for call stack retrieval, frame selection, local editing, and resume clearing in `tests/integration/test_us5_stack_locals.py`
+- [x] T031 [P] [US5] Integration test for call stack retrieval, frame selection, local editing, and resume clearing in `tests/integration/test_us5_stack_locals.py`
 
 ### Implementation for User Story 5
 
-- [ ] T032 [US5] Implement `StackService` (call stack fetch on halt, per-frame locals evaluation, `unavailable` handling for optimized-out locals, validated local assignment, auto-clear on run) in `src/jtagconn/core/stack_service.py`
+- [x] T032 [US5] Implement `StackService` (call stack fetch on halt, per-frame locals evaluation, `unavailable` handling for optimized-out locals, validated local assignment, auto-clear on run) in `src/jtagconn/core/stack_service.py`
 - [ ] T033 [US5] Implement `LocalsView` dock (call stack list + frame locals tree view with inline editing) in `src/jtagconn/ui/locals_view.py`
 
 ---
@@ -145,11 +145,11 @@
 
 ### Tests for User Story 6 ⚠️
 
-- [ ] T034 [P] [US6] Integration test for multi-core independent connect/load/watch, boot-dependency error reporting, and `run_all` / `halt_all` in `tests/integration/test_us6_multicore.py`
+- [x] T034 [P] [US6] Integration test for multi-core independent connect/load/watch, boot-dependency error reporting, and `run_all` / `halt_all` in `tests/integration/test_us6_multicore.py`
 
 ### Implementation for User Story 6
 
-- [ ] T035 [US6] Extend `TargetManager`, `WatchService`, `MemoryService`, and `StackService` for multi-core session isolation, boot-dependency diagnostics (`CoreNotAvailable`), and `run_all`/`halt_all` in `src/jtagconn/core/target_manager.py`
+- [x] T035 [US6] Extend `TargetManager`, `WatchService`, `MemoryService`, and `StackService` for multi-core session isolation, boot-dependency diagnostics (`CoreNotAvailable`), and `run_all`/`halt_all` in `src/jtagconn/core/target_manager.py`
 - [ ] T036 [US6] Implement `CoresPanel` dock and Run All / Halt All toolbar controls in `src/jtagconn/ui/cores_panel.py` and `src/jtagconn/ui/main_window.py`
 
 ---
