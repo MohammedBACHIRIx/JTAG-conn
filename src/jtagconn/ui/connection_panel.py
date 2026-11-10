@@ -6,10 +6,16 @@ from jtagconn.core.models import CoreState, ProbeKind
 
 from ._qt import (
     QComboBox,
+    QFileDialog,
+    QFormLayout,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
     QLabel,
     QLineEdit,
     QPushButton,
     QSpinBox,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -24,6 +30,11 @@ class ConnectionPanel(QWidget):
         self.probe_selector = QComboBox(self)
         self.device_selector = QComboBox(self)
         self.image_path_input = QLineEdit(self)
+        try:
+            self.image_path_input.setPlaceholderText("Select TI .out firmware file...")
+        except Exception:  # noqa: BLE001, S110
+            pass
+        self.browse_button = QPushButton("Browse...", self)
         self.recent_files_dropdown = QComboBox(self)
         self.refresh_interval_spinbox = QSpinBox(self)
         try:
@@ -36,8 +47,8 @@ class ConnectionPanel(QWidget):
         # Action buttons
         self.connect_button = QPushButton("Connect", self)
         self.disconnect_button = QPushButton("Disconnect", self)
-        self.load_button = QPushButton("Load", self)
-        self.run_button = QPushButton("Run", self)
+        self.load_button = QPushButton("Load .out", self)
+        self.run_button = QPushButton("Run / Resume", self)
         self.halt_button = QPushButton("Halt", self)
         self.reset_button = QPushButton("Reset", self)
         self.run_all_button = QPushButton("Run All", self)
@@ -45,13 +56,20 @@ class ConnectionPanel(QWidget):
 
         # Status display
         self.state_badge = QLabel(CoreState.Disconnected.value, self)
-        self.pc_label = QLabel("", self)
-        self.function_label = QLabel("", self)
+        self.pc_label = QLabel("-", self)
+        self.function_label = QLabel("-", self)
         self.status_label = QLabel("Disconnected", self)
 
         self._current_state = CoreState.Disconnected
         self._has_image = False
         self._connected_cores_count = 0
+
+        self._build_layout()
+
+        try:
+            self.browse_button.clicked.connect(self._on_browse_clicked)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
         # Wire recent file selection to image path input
         try:
@@ -68,6 +86,66 @@ class ConnectionPanel(QWidget):
         self.populate_probe_kinds()
         self.populate_devices()
         self.update_actions_for_state(CoreState.Disconnected, False, 0)
+
+    def _build_layout(self) -> None:
+        try:
+            root = QVBoxLayout(self)
+            root.setContentsMargins(8, 8, 8, 8)
+            root.setSpacing(8)
+
+            target_group = QGroupBox("Target & Firmware", self)
+            form = QFormLayout(target_group)
+            form.setContentsMargins(8, 8, 8, 8)
+            form.setSpacing(6)
+            form.addRow(QLabel("JTAG Probe:", target_group), self.probe_selector)
+            form.addRow(QLabel("C2000 Device:", target_group), self.device_selector)
+
+            file_row = QHBoxLayout()
+            file_row.addWidget(self.image_path_input, 1)
+            file_row.addWidget(self.browse_button)
+            form.addRow(QLabel("Firmware (.out):", target_group), file_row)
+            form.addRow(QLabel("Recent Files:", target_group), self.recent_files_dropdown)
+            form.addRow(QLabel("Live Refresh (ms):", target_group), self.refresh_interval_spinbox)
+            root.addWidget(target_group)
+
+            ctrl_group = QGroupBox("Execution Control", self)
+            grid = QGridLayout(ctrl_group)
+            grid.setContentsMargins(8, 8, 8, 8)
+            grid.setSpacing(6)
+            grid.addWidget(self.connect_button, 0, 0)
+            grid.addWidget(self.disconnect_button, 0, 1)
+            grid.addWidget(self.load_button, 1, 0, 1, 2)
+            grid.addWidget(self.run_button, 2, 0)
+            grid.addWidget(self.halt_button, 2, 1)
+            grid.addWidget(self.reset_button, 3, 0, 1, 2)
+            grid.addWidget(self.run_all_button, 4, 0)
+            grid.addWidget(self.halt_all_button, 4, 1)
+            root.addWidget(ctrl_group)
+
+            info_group = QGroupBox("Active Core Status", self)
+            info_form = QFormLayout(info_group)
+            info_form.setContentsMargins(8, 8, 8, 8)
+            info_form.setSpacing(4)
+            info_form.addRow(QLabel("State:", info_group), self.state_badge)
+            info_form.addRow(QLabel("PC:", info_group), self.pc_label)
+            info_form.addRow(QLabel("Function:", info_group), self.function_label)
+            root.addWidget(info_group)
+            root.addStretch(1)
+        except Exception:  # noqa: BLE001, S110
+            pass
+
+    def _on_browse_clicked(self) -> None:
+        try:
+            path, _ = QFileDialog.getOpenFileName(
+                self,
+                "Select TI C2000 Firmware (.out)",
+                "",
+                "TI Firmware Files (*.out *.elf);;All Files (*.*)",
+            )
+            if path:
+                self.set_image_path(path)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
     # --- population/helpers ---
     def populate_probe_kinds(self) -> None:

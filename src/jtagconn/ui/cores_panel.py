@@ -5,7 +5,18 @@ from typing import Any
 
 from jtagconn.core.models import CoreState
 
-from ._qt import QComboBox, QPushButton, QTableWidget, QTableWidgetItem, QWidget, Signal
+from ._qt import (
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QVBoxLayout,
+    QWidget,
+    Signal,
+)
 
 
 class CoresPanel(QWidget):
@@ -34,10 +45,32 @@ class CoresPanel(QWidget):
         self.cores_table = QTableWidget(0, 4, self)
         try:
             self.cores_table.setHorizontalHeaderLabels(["Core", "State", "PC / Function", "Image"])
+            if hasattr(self.cores_table, "horizontalHeader"):
+                hdr = self.cores_table.horizontalHeader()
+                if hdr is not None and hasattr(hdr, "setStretchLastSection"):
+                    hdr.setStretchLastSection(True)
+                if hdr is not None and hasattr(hdr, "setSectionResizeMode"):
+                    hdr.setSectionResizeMode(QHeaderView.Stretch)
         except Exception:  # noqa: BLE001, S110
             pass
         self.connect_core_button = QPushButton("Connect Core", self)
         self.disconnect_core_button = QPushButton("Disconnect Core", self)
+
+        try:
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(6)
+            top_row = QHBoxLayout()
+            top_row.addWidget(QLabel("Active Core:", self))
+            top_row.addWidget(self.core_selector, 1)
+            layout.addLayout(top_row)
+            btn_row = QHBoxLayout()
+            btn_row.addWidget(self.connect_core_button)
+            btn_row.addWidget(self.disconnect_core_button)
+            layout.addLayout(btn_row)
+            layout.addWidget(self.cores_table, 1)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
         self._cores: list[str] = []
         self._core_rows: dict[str, int] = {}

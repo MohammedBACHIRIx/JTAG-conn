@@ -5,7 +5,7 @@ from typing import Any
 
 from jtagconn.core.logging_service import LogEntry, OperationLogger
 
-from ._qt import QComboBox, QPlainTextEdit, QPushButton, QWidget
+from ._qt import QComboBox, QHBoxLayout, QLabel, QPlainTextEdit, QPushButton, QVBoxLayout, QWidget
 
 
 class LogView(QWidget):
@@ -24,7 +24,21 @@ class LogView(QWidget):
             self.text.setReadOnly(True)
         except Exception:  # noqa: BLE001, S110
             pass
-        self.clear_button = QPushButton("Clear", self)
+        self.clear_button = QPushButton("Clear Log", self)
+
+        try:
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(4)
+            top = QHBoxLayout()
+            top.addWidget(QLabel("Log Level:", self))
+            top.addWidget(self.level_filter)
+            top.addStretch(1)
+            top.addWidget(self.clear_button)
+            layout.addLayout(top)
+            layout.addWidget(self.text, 1)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
         self._logger: OperationLogger | None = None
         self._entries: list[LogEntry] = []

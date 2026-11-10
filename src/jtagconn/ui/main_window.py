@@ -115,7 +115,9 @@ class MainWindow(QMainWindow):
     # --- layout ---
     def _assemble_layout(self) -> None:
         try:
-            self.setWindowTitle("JTAG-conn")
+            self.setWindowTitle("JTAG-conn — TI C2000 JTAG Debugger")
+            if hasattr(self, "resize"):
+                self.resize(1360, 840)
         except Exception:  # noqa: BLE001, S110
             pass
         try:
@@ -123,28 +125,36 @@ class MainWindow(QMainWindow):
         except Exception:  # noqa: BLE001, S110
             pass
 
-        # Left dock: connection + cores
-        self.left_dock = QDockWidget("Connection / Cores", self)
-        try:
-            self.left_dock.setWidget(self.cores_panel)
-        except Exception:  # noqa: BLE001, S110
-            pass
-        # In fallback/headless we can't easily nest both; expose connection panel too
-        self.connection_dock = QDockWidget("Connection", self)
+        # Left docks: Connection and Multi-Core table
+        self.connection_dock = QDockWidget("Connection & Target Control", self)
         try:
             self.connection_dock.setWidget(self.connection_panel)
+            if hasattr(self.connection_panel, "setMinimumWidth"):
+                self.connection_panel.setMinimumWidth(310)
         except Exception:  # noqa: BLE001, S110
             pass
 
-        self.right_dock = QDockWidget("Call Stack + Locals", self)
+        self.left_dock = QDockWidget("Device Cores (Multi-Core)", self)
+        try:
+            self.left_dock.setWidget(self.cores_panel)
+            if hasattr(self.cores_panel, "setMinimumWidth"):
+                self.cores_panel.setMinimumWidth(310)
+        except Exception:  # noqa: BLE001, S110
+            pass
+
+        self.right_dock = QDockWidget("Call Stack & Frame Locals", self)
         try:
             self.right_dock.setWidget(self.locals_view)
+            if hasattr(self.locals_view, "setMinimumWidth"):
+                self.locals_view.setMinimumWidth(320)
         except Exception:  # noqa: BLE001, S110
             pass
 
-        self.bottom_dock = QDockWidget("Log", self)
+        self.bottom_dock = QDockWidget("Diagnostic Log", self)
         try:
             self.bottom_dock.setWidget(self.log_view)
+            if hasattr(self.log_view, "setMinimumHeight"):
+                self.log_view.setMinimumHeight(140)
         except Exception:  # noqa: BLE001, S110
             pass
 

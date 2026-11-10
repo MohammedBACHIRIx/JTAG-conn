@@ -5,6 +5,9 @@ from typing import Any
 from jtagconn.core.models import StackFrame, ValueStatus
 
 from ._qt import (
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
@@ -12,6 +15,7 @@ from ._qt import (
     QTableWidgetItem,
     QTreeWidget,
     QTreeWidgetItem,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -24,17 +28,52 @@ class LocalsView(QWidget):
         self.stack_list = QTreeWidget(self)
         try:
             self.stack_list.setHeaderLabels(["Frame", "Function", "PC"])
+            if hasattr(self.stack_list, "header"):
+                hdr = self.stack_list.header()
+                if hdr is not None and hasattr(hdr, "setSectionResizeMode"):
+                    hdr.setSectionResizeMode(QHeaderView.Stretch)
         except Exception:  # noqa: BLE001, S110
             pass
         self.locals_table = QTableWidget(0, 4, self)
         try:
             self.locals_table.setHorizontalHeaderLabels(["Name", "Type", "Value", "Status"])
+            if hasattr(self.locals_table, "horizontalHeader"):
+                hdr2 = self.locals_table.horizontalHeader()
+                if hdr2 is not None and hasattr(hdr2, "setSectionResizeMode"):
+                    hdr2.setSectionResizeMode(QHeaderView.Stretch)
         except Exception:  # noqa: BLE001, S110
             pass
         self.edit_name_input = QLineEdit(self)
         self.edit_value_input = QLineEdit(self)
-        self.apply_button = QPushButton("Apply", self)
+        self.apply_button = QPushButton("Apply Local", self)
         self.error_label = QLabel("", self)
+
+        try:
+            self.edit_name_input.setPlaceholderText("Local name (e.g. err)")
+            self.edit_value_input.setPlaceholderText("New value")
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(6)
+
+            stack_group = QGroupBox("Call Stack (Halted)", self)
+            sl = QVBoxLayout(stack_group)
+            sl.setContentsMargins(6, 6, 6, 6)
+            sl.addWidget(self.stack_list)
+            layout.addWidget(stack_group, 1)
+
+            locals_group = QGroupBox("Frame Local Variables", self)
+            ll = QVBoxLayout(locals_group)
+            ll.setContentsMargins(6, 6, 6, 6)
+            ll.addWidget(self.locals_table, 1)
+            edit_row = QHBoxLayout()
+            edit_row.addWidget(self.edit_name_input, 1)
+            edit_row.addWidget(self.edit_value_input, 1)
+            edit_row.addWidget(self.apply_button)
+            ll.addLayout(edit_row)
+            ll.addWidget(self.error_label)
+            layout.addWidget(locals_group, 2)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
         self._frames: list[StackFrame] = []
         self._selected_frame_index: int | None = None

@@ -6,12 +6,15 @@ from jtagconn.core.models import MemoryFormat, MemoryView
 
 from ._qt import (
     QComboBox,
+    QHBoxLayout,
+    QHeaderView,
     QLabel,
     QLineEdit,
     QPushButton,
     QSpinBox,
     QTableWidget,
     QTableWidgetItem,
+    QVBoxLayout,
     QWidget,
 )
 
@@ -22,6 +25,11 @@ class MemoryViewWidget(QWidget):
     def __init__(self, parent: Any = None) -> None:
         super().__init__(parent)
         self.start_expr_input = QLineEdit(self)
+        try:
+            self.start_expr_input.setPlaceholderText("Address (0xC000) or symbol (g_buffer)...")
+            self.start_expr_input.setText("0xC000")
+        except Exception:  # noqa: BLE001, S110
+            pass
         self.length_input = QSpinBox(self)
         try:
             self.length_input.setRange(1, 65536)
@@ -29,11 +37,17 @@ class MemoryViewWidget(QWidget):
         except Exception:  # noqa: BLE001, S110
             pass
         self.format_selector = QComboBox(self)
-        self.refresh_button = QPushButton("Refresh", self)
+        self.refresh_button = QPushButton("Refresh Memory", self)
         self.status_label = QLabel("", self)
         self.table = QTableWidget(0, 2, self)
         try:
             self.table.setHorizontalHeaderLabels(["Address", "Values"])
+            if hasattr(self.table, "horizontalHeader"):
+                hdr = self.table.horizontalHeader()
+                if hdr is not None and hasattr(hdr, "setStretchLastSection"):
+                    hdr.setStretchLastSection(True)
+                if hdr is not None and hasattr(hdr, "setSectionResizeMode"):
+                    hdr.setSectionResizeMode(0, QHeaderView.ResizeToContents)
         except Exception:  # noqa: BLE001, S110
             pass
 
@@ -42,6 +56,25 @@ class MemoryViewWidget(QWidget):
                 self.format_selector.addItem(fmt.value)
             except Exception:  # noqa: BLE001, S110
                 pass
+
+        try:
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(6)
+            top = QHBoxLayout()
+            top.addWidget(QLabel("Start Address / Symbol:", self))
+            top.addWidget(self.start_expr_input, 2)
+            top.addWidget(QLabel("Length:", self))
+            top.addWidget(self.length_input)
+            top.addWidget(QLabel("Format:", self))
+            top.addWidget(self.format_selector)
+            top.addWidget(self.refresh_button)
+            top.addWidget(QLabel("Status:", self))
+            top.addWidget(self.status_label)
+            layout.addLayout(top)
+            layout.addWidget(self.table, 1)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
         self._last_view: MemoryView | None = None
 

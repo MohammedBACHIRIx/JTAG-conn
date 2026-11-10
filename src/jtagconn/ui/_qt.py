@@ -831,6 +831,86 @@ except Exception:  # noqa: BLE001
         def getOpenFileName(parent: Any = None, caption: str = "", dir: str = "", filter: str = "") -> tuple[str, str]:
             return ("", "")
 
+    class _BaseLayout(QObject):
+        def __init__(self, parent: Any = None) -> None:
+            super().__init__(parent)
+            self._items: list[Any] = []
+            if parent is not None and hasattr(parent, "setLayout"):
+                try:
+                    parent.setLayout(self)
+                except Exception:  # noqa: BLE001, S110
+                    pass
+
+        def addWidget(self, widget: Any, *args: Any, **kwargs: Any) -> None:
+            self._items.append(widget)
+
+        def addLayout(self, layout: Any, *args: Any, **kwargs: Any) -> None:
+            self._items.append(layout)
+
+        def addRow(self, *args: Any, **kwargs: Any) -> None:
+            self._items.append(args)
+
+        def addStretch(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def setContentsMargins(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def setSpacing(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def count(self) -> int:
+            return len(self._items)
+
+    class QVBoxLayout(_BaseLayout):
+        pass
+
+    class QHBoxLayout(_BaseLayout):
+        pass
+
+    class QFormLayout(_BaseLayout):
+        pass
+
+    class QGridLayout(_BaseLayout):
+        pass
+
+    class QGroupBox(QWidget):
+        def __init__(self, title: str = "", parent: Any = None) -> None:
+            super().__init__(parent)
+            self._title = str(title)
+
+        def title(self) -> str:
+            return self._title
+
+        def setTitle(self, title: str) -> None:
+            self._title = str(title)
+
+    class QSplitter(QWidget):
+        def __init__(self, orientation: Any = None, parent: Any = None) -> None:
+            super().__init__(parent)
+            self._orientation = orientation
+            self._widgets: list[Any] = []
+
+        def addWidget(self, widget: Any) -> None:
+            self._widgets.append(widget)
+
+        def setSizes(self, sizes: list[int]) -> None:
+            pass
+
+        def setStretchFactor(self, index: int, stretch: int) -> None:
+            pass
+
+    class QHeaderView(QWidget):
+        Stretch = 1
+        ResizeToContents = 3
+        Interactive = 0
+
+        def setSectionResizeMode(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
+        def setStretchLastSection(self, *args: Any, **kwargs: Any) -> None:
+            pass
+
     class QApplication:
         _instance: QApplication | None = None
 
@@ -883,6 +963,13 @@ except Exception:  # noqa: BLE001
         QTabWidget = QTabWidget
         QMessageBox = QMessageBox
         QFileDialog = QFileDialog
+        QVBoxLayout = QVBoxLayout
+        QHBoxLayout = QHBoxLayout
+        QFormLayout = QFormLayout
+        QGridLayout = QGridLayout
+        QGroupBox = QGroupBox
+        QSplitter = QSplitter
+        QHeaderView = QHeaderView
 
     QtCore = _QtCoreNS()  # type: ignore[assignment]
     QtGui = _QtGuiNS()  # type: ignore[assignment]
@@ -921,3 +1008,10 @@ if HAS_QT_WIDGETS:
     QTabWidget = QtWidgets.QTabWidget
     QMessageBox = QtWidgets.QMessageBox
     QFileDialog = QtWidgets.QFileDialog
+    QVBoxLayout = QtWidgets.QVBoxLayout
+    QHBoxLayout = QtWidgets.QHBoxLayout
+    QFormLayout = QtWidgets.QFormLayout
+    QGridLayout = QtWidgets.QGridLayout
+    QGroupBox = QtWidgets.QGroupBox
+    QSplitter = QtWidgets.QSplitter
+    QHeaderView = QtWidgets.QHeaderView

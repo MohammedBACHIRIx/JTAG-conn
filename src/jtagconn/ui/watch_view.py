@@ -5,7 +5,18 @@ from typing import Any
 from jtagconn.core.models import DisplayFormat, ValueNode, ValueStatus
 from jtagconn.symbols.index import SymbolIndex
 
-from ._qt import QComboBox, QLabel, QLineEdit, QPushButton, QTreeWidget, QTreeWidgetItem, QWidget
+from ._qt import (
+    QComboBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
 
 
 class WatchView(QWidget):
@@ -32,6 +43,10 @@ class WatchView(QWidget):
         try:
             self.tree.setColumnCount(5)
             self.tree.setHeaderLabels(["Expression", "Type", "Value", "Format", "Status"])
+            if hasattr(self.tree, "header"):
+                hdr = self.tree.header()
+                if hdr is not None and hasattr(hdr, "setSectionResizeMode"):
+                    hdr.setSectionResizeMode(QHeaderView.Stretch)
         except Exception:  # noqa: BLE001, S110
             pass
 
@@ -40,6 +55,34 @@ class WatchView(QWidget):
                 self.format_selector.addItem(fmt.value)
             except Exception:  # noqa: BLE001, S110
                 pass
+
+        try:
+            self.search_input.setPlaceholderText("Symbol or expression (e.g. g_counter, g_ctrl.gain)...")
+            self.edit_value_input.setPlaceholderText("New value (e.g. 42, 0x2A, RUN)...")
+            layout = QVBoxLayout(self)
+            layout.setContentsMargins(8, 8, 8, 8)
+            layout.setSpacing(6)
+
+            bar1 = QHBoxLayout()
+            bar1.addWidget(QLabel("Symbol:", self))
+            bar1.addWidget(self.search_input, 2)
+            bar1.addWidget(QLabel("Format:", self))
+            bar1.addWidget(self.format_selector)
+            bar1.addWidget(self.add_button)
+            bar1.addWidget(self.remove_button)
+            layout.addLayout(bar1)
+
+            bar2 = QHBoxLayout()
+            bar2.addWidget(QLabel("Write Value:", self))
+            bar2.addWidget(self.edit_value_input, 1)
+            bar2.addWidget(self.apply_edit_button)
+            layout.addLayout(bar2)
+
+            layout.addWidget(self.suggestions_label)
+            layout.addWidget(self.error_label)
+            layout.addWidget(self.tree, 1)
+        except Exception:  # noqa: BLE001, S110
+            pass
 
         self._symbol_index = SymbolIndex()
         self._entries_by_expr: dict[str, Any] = {}
