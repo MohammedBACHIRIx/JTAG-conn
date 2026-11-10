@@ -12,8 +12,17 @@ from jtagconn.core.logging_service import OperationLogger
 from jtagconn.core.models import CoreState, DisplayFormat, MemoryFormat, Probe, ProbeKind
 from jtagconn.core.worker import EngineWorker
 from jtagconn.persistence.session import SessionStore
+from jtagconn.ui._qt import QApplication
 from jtagconn.ui.main_window import MainWindow
 from tests.fixtures.make_fixtures import create_sample_elf_out
+
+
+@pytest.fixture(autouse=True)
+def _qapp() -> QApplication:
+    app = QApplication.instance()
+    if app is None:
+        app = QApplication([])
+    return app
 
 
 @pytest.fixture

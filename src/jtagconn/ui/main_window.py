@@ -51,6 +51,11 @@ class MainWindow(QMainWindow):
         confirm_flash_handler: Callable[[list[Section]], bool] | None = None,
         parent: Any = None,
     ) -> None:
+        if HAS_QT_WIDGETS:
+            from ._qt import QApplication
+
+            if QApplication.instance() is None:
+                QApplication([])
         super().__init__(parent)
         self.backend = backend
         self.logger = logger or getattr(backend, "logger", None) or OperationLogger()

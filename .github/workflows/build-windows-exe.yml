@@ -26,6 +26,8 @@ jobs:
 
       - name: Run tests
         shell: pwsh
+        env:
+          QT_QPA_PLATFORM: offscreen
         run: |
           python -m pytest -q
 
